@@ -49,12 +49,6 @@ Subject should be concise and imperative:
 - Prefer <= 72 characters.
 - Describe what changed, not why.
 
-Examples:
-
-- `feat: auth - add refresh token rotation`
-- `fix: api - handle empty payload in webhook`
-- `refactor: ui - simplify modal state handling`
-
 ### 5) Commit locally
 
 - If no changes are staged and the user did not request otherwise, stage with `git add -A` (or add specific paths if the user indicates a subset).

@@ -42,6 +42,7 @@ Skills Router 是一个基于 [Model Context Protocol (MCP)](https://modelcontex
 - **✏️ Skill Editor**: 直接在 GUI 中编辑 `SKILL.md` 文件并保存
 - **🔧 Skill Simulator**: 配置参数并执行技能,查看输出结果
 - **➕ Create/Delete Skills**: 通过 UI 创建新技能或删除现有技能
+- **⚙️ 配置说明**: 内置多平台(Claude/VSCode/Cursor/Cline)MCP 配置指南
 - **🌓 主题切换**: 支持深色/浅色主题切换,偏好自动保存
 - **📱 响应式布局**: 内容区域自动填充窗口,适配不同屏幕尺寸
 
@@ -53,7 +54,7 @@ npm install
 npm run dev
 ```
 
-应用将自动启动 Electron 窗口并加载技能列表。
+应用将自动启动 Electron 窗口并加载技能列表。点击标题栏的"⚙️ 配置说明"按钮可查看不同平台的 MCP 配置方法。
 
 ## 快速开始
 

@@ -11,5 +11,3 @@ scripts:
 
 # Hello Skill
 This is an example skill.
-
-每次追加一句：`哈喽啊~`

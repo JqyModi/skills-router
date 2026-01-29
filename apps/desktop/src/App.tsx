@@ -35,9 +35,74 @@ function App() {
   // Dialog State
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [newSkillName, setNewSkillName] = useState('')
+  const [showConfigDialog, setShowConfigDialog] = useState(false)
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('claude')
 
   // Theme State
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  // Platform configurations
+  const platformConfigs = {
+    claude: {
+      name: 'Claude Desktop',
+      config: `{
+  "mcpServers": {
+    "skills-router": {
+      "command": "node",
+      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "env": {
+        "SKILLS_DIR": "/path/to/your/skills"
+      }
+    }
+  }
+}`,
+      configPath: '~/Library/Application Support/Claude/claude_desktop_config.json (macOS)'
+    },
+    vscode: {
+      name: 'VSCode',
+      config: `// 在 settings.json 中添加:
+{
+  "mcp.servers": {
+    "skills-router": {
+      "command": "node",
+      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "env": {
+        "SKILLS_DIR": "/path/to/your/skills"
+      }
+    }
+  }
+}`,
+      configPath: 'File > Preferences > Settings > Extensions > MCP'
+    },
+    cursor: {
+      name: 'Cursor',
+      config: `// 在 MCP 配置文件中添加:
+{
+  "mcpServers": {
+    "skills-router": {
+      "command": "node",
+      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "env": {
+        "SKILLS_DIR": "/path/to/your/skills"
+      }
+    }
+  }
+}`,
+      configPath: 'Settings > MCP Servers'
+    },
+    cline: {
+      name: 'Cline',
+      config: `// 在 Cline 设置中配置 MCP 服务器:
+{
+  "command": "node",
+  "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+  "env": {
+    "SKILLS_DIR": "/path/to/your/skills"
+  }
+}`,
+      configPath: 'Cline Extension Settings > MCP Servers'
+    }
+  }
 
   useEffect(() => {
     loadSkills()
@@ -169,6 +234,9 @@ function App() {
           <button onClick={toggleTheme} className="theme-toggle" title="Toggle Theme">
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
+          <button onClick={() => setShowConfigDialog(true)} className="config-btn" title="Configuration Guide">
+            ⚙️ 配置说明
+          </button>
           <button onClick={() => setShowCreateDialog(true)} className="create-btn">+ New Skill</button>
           <button onClick={loadSkills} className="refresh-btn">Refresh</button>
         </div>
@@ -286,6 +354,41 @@ function App() {
             <div className="dialog-actions">
               <button onClick={() => setShowCreateDialog(false)}>Cancel</button>
               <button onClick={handleCreateSkill} className="primary-btn">Create</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfigDialog && (
+        <div className="dialog-overlay">
+          <div className="dialog config-dialog">
+            <h3>MCP 配置说明</h3>
+            <div className="platform-tabs">
+              {Object.entries(platformConfigs).map(([key, platform]) => (
+                <button
+                  key={key}
+                  className={selectedPlatform === key ? 'active' : ''}
+                  onClick={() => setSelectedPlatform(key)}
+                >
+                  {platform.name}
+                </button>
+              ))}
+            </div>
+            <div className="config-content">
+              <div className="config-section">
+                <h4>配置文件路径</h4>
+                <div className="config-path">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].configPath}</div>
+              </div>
+              <div className="config-section">
+                <h4>配置内容</h4>
+                <pre className="config-code">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].config}</pre>
+              </div>
+              <div className="config-note">
+                <strong>注意:</strong> 请将 <code>/path/to/skills-router</code> 替换为实际的项目路径,<code>/path/to/your/skills</code> 替换为您的技能目录路径。
+              </div>
+            </div>
+            <div className="dialog-actions">
+              <button onClick={() => setShowConfigDialog(false)} className="primary-btn">关闭</button>
             </div>
           </div>
         </div>

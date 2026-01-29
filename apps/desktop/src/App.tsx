@@ -41,6 +41,37 @@ function App() {
   // Theme State
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
+  // App Info for Config Guide
+  const [appInfo, setAppInfo] = useState<{ skillsDir: string, serverPath: string }>({
+    skillsDir: '/path/to/your/skills',
+    serverPath: '/path/to/skills-router/packages/core/dist/index.js'
+  })
+
+  useEffect(() => {
+    loadSkills()
+    loadAppInfo()
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null
+    if (savedTheme) {
+      setTheme(savedTheme)
+      document.documentElement.setAttribute('data-theme', savedTheme)
+    }
+  }, [])
+
+  const loadAppInfo = async () => {
+    try {
+      const info = await window.ipcRenderer.invoke('get-app-info')
+      if (info) setAppInfo(info)
+    } catch (e) {
+      console.error('Failed to load app info:', e)
+    }
+  }
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    alert('已复制到剪贴板')
+  }
+
   // Platform configurations
   const platformConfigs = {
     claude: {
@@ -49,60 +80,46 @@ function App() {
   "mcpServers": {
     "skills-router": {
       "command": "node",
-      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
       "env": {
-        "SKILLS_DIR": "/path/to/your/skills"
+        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
       }
     }
   }
 }`,
-      configPath: '~/Library/Application Support/Claude/claude_desktop_config.json (macOS)'
+      configPath: '~/Library/Application Support/Claude/claude_desktop_config.json'
     },
     vscode: {
       name: 'VSCode',
-      config: `// 在 settings.json 中添加:
-{
+      config: `{
   "mcp.servers": {
     "skills-router": {
       "command": "node",
-      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
       "env": {
-        "SKILLS_DIR": "/path/to/your/skills"
+        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
       }
     }
   }
 }`,
-      configPath: 'File > Preferences > Settings > Extensions > MCP'
+      configPath: 'Settings (JSON) > mcp.servers'
     },
     cursor: {
       name: 'Cursor',
-      config: `// 在 MCP 配置文件中添加:
-{
+      config: `{
   "mcpServers": {
     "skills-router": {
       "command": "node",
-      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
       "env": {
-        "SKILLS_DIR": "/path/to/your/skills"
+        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
       }
     }
   }
 }`,
-      configPath: 'Settings > MCP Servers'
-    },
-    cline: {
-      name: 'Cline',
-      config: `// 在 Cline 设置中配置 MCP 服务器:
-{
-  "command": "node",
-  "args": ["/path/to/skills-router/packages/core/dist/index.js"],
-  "env": {
-    "SKILLS_DIR": "/path/to/your/skills"
-  }
-}`,
-      configPath: 'Cline Extension Settings > MCP Servers'
+      configPath: 'Cursor Settings > MCP'
     }
-  }
+  } as const;
 
   useEffect(() => {
     loadSkills()
@@ -379,17 +396,19 @@ function App() {
                 <h4>配置文件路径</h4>
                 <div className="config-path">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].configPath}</div>
               </div>
-              <div className="config-section">
-                <h4>配置内容</h4>
-                <pre className="config-code">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].config}</pre>
+              <h4>配置内容</h4>
+              <div className="code-header">
+                <span>JSON</span>
+                <button onClick={() => handleCopy(platformConfigs[selectedPlatform as keyof typeof platformConfigs].config)}>复制</button>
               </div>
-              <div className="config-note">
-                <strong>注意:</strong> 请将 <code>/path/to/skills-router</code> 替换为实际的项目路径,<code>/path/to/your/skills</code> 替换为您的技能目录路径。
-              </div>
+              <pre className="config-code">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].config}</pre>
             </div>
-            <div className="dialog-actions">
-              <button onClick={() => setShowConfigDialog(false)} className="primary-btn">关闭</button>
+            <div className="config-note">
+              <strong>注意:</strong> 请将 <code>/path/to/skills-router</code> 替换为实际的项目路径,<code>/path/to/your/skills</code> 替换为您的技能目录路径。
             </div>
+          </div>
+          <div className="dialog-actions">
+            <button onClick={() => setShowConfigDialog(false)} className="primary-btn">关闭</button>
           </div>
         </div>
       )}

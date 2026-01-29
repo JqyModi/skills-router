@@ -550,7 +550,8 @@ body {
   padding: 15px;
   background-color: var(--bg-primary);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
   font-family: 'Monaco', 'Courier New', monospace;
   font-size: 0.85rem;
   overflow-x: auto;
@@ -558,6 +559,33 @@ body {
   line-height: 1.6;
   color: var(--text-primary);
 }
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.code-header button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.code-header button:hover {
+  background: var(--accent-hover);
+}
+
 
 .config-note {
   padding: 12px;

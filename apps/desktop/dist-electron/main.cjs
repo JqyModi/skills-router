@@ -6502,6 +6502,8 @@ class SkillExecutor {
 const __dirname$1 = path.dirname(new URL(typeof document === "undefined" ? require("url").pathToFileURL(__filename).href : _documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === "SCRIPT" && _documentCurrentScript.src || new URL("main.cjs", document.baseURI).href).pathname);
 process.env.DIST = path.join(__dirname$1, "../dist");
 process.env.VITE_PUBLIC = electron.app.isPackaged ? process.env.DIST : path.join(process.env.DIST, "../public");
+const DIST_PATH = process.env.DIST || "";
+const PUBLIC_PATH = process.env.VITE_PUBLIC || "";
 let win;
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const SKILLS_DIR = process.env.SKILLS_DIR || (electron.app.isPackaged ? path.join(electron.app.getPath("userData"), "skills") : path.resolve(__dirname$1, "../../../skills"));
@@ -6509,7 +6511,7 @@ function createWindow() {
   win = new electron.BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    icon: path.join(PUBLIC_PATH, "vite.svg"),
     webPreferences: {
       preload: path.join(__dirname$1, "preload.js")
     }
@@ -6520,7 +6522,7 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(process.env.DIST, "index.html"));
+    win.loadFile(path.join(DIST_PATH, "index.html"));
   }
 }
 electron.app.on("window-all-closed", () => {
@@ -6534,7 +6536,15 @@ electron.app.on("activate", () => {
     createWindow();
   }
 });
-electron.app.whenReady().then(createWindow);
+electron.app.whenReady().then(async () => {
+  try {
+    await fs.access(SKILLS_DIR);
+  } catch {
+    console.log(`Creating skills directory at ${SKILLS_DIR}`);
+    await fs.mkdir(SKILLS_DIR, { recursive: true });
+  }
+  createWindow();
+});
 electron.ipcMain.handle("get-skills", async () => {
   console.log(`Scanning skills in: ${SKILLS_DIR}`);
   const scanner = new SkillScanner(SKILLS_DIR);
@@ -6606,4 +6616,11 @@ electron.ipcMain.handle("delete-skill", async (_event, skillPath) => {
   } catch (e) {
     return { success: false, error: e.message };
   }
+});
+electron.ipcMain.handle("get-app-info", () => {
+  return {
+    skillsDir: SKILLS_DIR,
+    // The main.cjs is the server entry point for MCP
+    serverPath: path.join(__dirname$1, "main.cjs")
+  };
 });

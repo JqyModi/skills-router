@@ -8,7 +8,35 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.skillsrouter.app",
+    "productName": "SkillsRouter",
+    "directories": {
+      "output": "release/${version}"
+    },
+    "files": [
+      "dist",
+      "dist-electron"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "artifactName": "${productName}-${version}-mac.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "${productName}-${version}-win.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "dependencies": {
     "react": "^19.2.0",

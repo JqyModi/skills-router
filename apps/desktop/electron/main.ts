@@ -22,6 +22,9 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 process.env.DIST = path.join(__dirname, '../dist')
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
 
+const DIST_PATH = process.env.DIST || '';
+const PUBLIC_PATH = process.env.VITE_PUBLIC || '';
+
 let win: BrowserWindow | null
 // VITE_DEV_SERVER_URL is passed by vite-plugin-electron-renderer
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
@@ -39,7 +42,7 @@ function createWindow() {
     win = new BrowserWindow({
         width: 1200,
         height: 800,
-        icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+        icon: path.join(PUBLIC_PATH, 'vite.svg'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
         },
@@ -53,8 +56,7 @@ function createWindow() {
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL)
     } else {
-        // win.loadFile('dist/index.html')
-        win.loadFile(path.join(process.env.DIST, 'index.html'))
+        win.loadFile(path.join(DIST_PATH, 'index.html'))
     }
 }
 
@@ -76,7 +78,19 @@ app.on('activate', () => {
     }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(async () => {
+    // Ensure SKILLS_DIR exists
+    try {
+        await fs.access(SKILLS_DIR);
+    } catch {
+        console.log(`Creating skills directory at ${SKILLS_DIR}`);
+        await fs.mkdir(SKILLS_DIR, { recursive: true });
+
+        // In a real distribution, we might copy a template skill here
+        // For now, just ensure the folder exists so scanner doesn't crash
+    }
+    createWindow();
+})
 
 // IPC Handlers for Skills Router
 ipcMain.handle('get-skills', async () => {
@@ -161,4 +175,12 @@ ipcMain.handle('delete-skill', async (_event, skillPath) => {
     } catch (e: any) {
         return { success: false, error: e.message };
     }
+});
+
+ipcMain.handle('get-app-info', () => {
+    return {
+        skillsDir: SKILLS_DIR,
+        // The main.cjs is the server entry point for MCP
+        serverPath: path.join(__dirname, 'main.cjs')
+    };
 });

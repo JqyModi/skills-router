@@ -102,7 +102,38 @@ description: 一个帮助润色文案的技能。
 2. ...
 ```
 
-### 示例 `SKILL.md` (脚本执行型)
+## 👥 团队分发与部署
+
+Skills Router 已配置好分发支持，你可以轻松地将其打包并分享给团队成员使用。
+
+### 1. 开发者：如何打包分发
+
+在 `apps/desktop` 目录下运行：
+
+```bash
+npm run dist
+```
+
+打包完成后，产物将生成在 `apps/desktop/release/1.0.0/` 目录下：
+- **macOS**: `SkillsRouter-1.0.0-mac.dmg`
+- **Windows**: `SkillsRouter-1.0.0-win.exe`
+
+你可以直接将该文件分发给团队成员。
+
+### 2. 使用者：如何开始使用
+
+接收者拿到安装包后，只需以下几步即可开始使用：
+
+1. **安装并启动**：直接双击安装并打开 Skills Router。
+2. **快速配置**：
+   - 点击应用顶部的 **"⚙️ 配置说明"** 按钮。
+   - 选择对应的平台（如 Claude Desktop）。
+   - 点击 **"复制"** 按钮获取为您电脑自动生成的 JSON 配置。
+   - 将配置粘贴到 MCP 客户端的配置文件中即可。
+3. **环境要求**：
+   - 确保电脑已安装 [Node.js](https://nodejs.org/)（执行 JS 脚本型技能需要）。
+
+## 示例 `SKILL.md` (脚本执行型)
 
 ```markdown
 ---
@@ -126,9 +157,9 @@ scripts:
   "mcpServers": {
     "skills-router": {
       "command": "node",
-      "args": ["/path/to/skills-router/packages/core/dist/index.js"],
+      "args": ["${serverPath}"],
       "env": {
-        "SKILLS_DIR": "/path/to/your/custom/skills"
+        "SKILLS_DIR": "${skillsDir}"
       }
     }
   }

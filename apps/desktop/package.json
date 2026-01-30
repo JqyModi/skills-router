@@ -2,6 +2,8 @@
   "name": "skills-router-desktop",
   "private": true,
   "version": "1.0.0",
+  "description": "A desktop GUI for managing and executing Skills via MCP.",
+  "author": "Antigravity",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
@@ -14,6 +16,7 @@
   "build": {
     "appId": "com.skillsrouter.app",
     "productName": "SkillsRouter",
+    "electronVersion": "28.2.0",
     "directories": {
       "output": "release/${version}"
     },
@@ -22,6 +25,7 @@
       "dist-electron"
     ],
     "mac": {
+      "category": "public.app-category.developer-tools",
       "target": [
         "dmg"
       ],
@@ -49,7 +53,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^28.2.0",
+    "electron": "28.2.0",
     "electron-builder": "^24.9.1",
     "vite-plugin-electron": "^0.15.6",
     "vite-plugin-electron-renderer": "^0.14.6",

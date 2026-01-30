@@ -422,11 +422,14 @@ body {
   width: 300px;
   border: 1px solid var(--border);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .dialog h3 {
   margin-top: 0;
   margin-bottom: 16px;
+  padding-right: 30px;
+  /* Space for close button if needed */
 }
 
 .dialog input {
@@ -449,6 +452,7 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 20px;
 }
 
 .dialog-actions button {
@@ -490,8 +494,47 @@ body {
 .config-dialog {
   max-width: 700px;
   width: 90vw;
-  max-height: 80vh;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.config-dialog-header {
+  padding: 24px 24px 10px 24px;
+}
+
+.config-dialog-body {
+  padding: 0 24px 24px 24px;
   overflow-y: auto;
+  flex: 1;
+}
+
+.dialog-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.dialog-close-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .platform-tabs {

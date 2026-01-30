@@ -71,23 +71,17 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) {
+    if (app.isReady() && BrowserWindow.getAllWindows().length === 0) {
         createWindow()
     }
 })
 
 app.whenReady().then(async () => {
-    // Ensure SKILLS_DIR exists
     try {
         await fs.access(SKILLS_DIR);
     } catch {
         console.log(`Creating skills directory at ${SKILLS_DIR}`);
         await fs.mkdir(SKILLS_DIR, { recursive: true });
-
-        // In a real distribution, we might copy a template skill here
-        // For now, just ensure the folder exists so scanner doesn't crash
     }
     createWindow();
 })

@@ -118,6 +118,21 @@ function App() {
   }
 }`,
       configPath: 'Cursor Settings > MCP'
+    },
+    cline: {
+      name: 'Cline',
+      config: `{
+  "mcpServers": {
+    "skills-router": {
+      "command": "node",
+      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
+      "env": {
+        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
+      }
+    }
+  }
+}`,
+      configPath: 'Cline Settings > MCP'
     }
   } as const;
 
@@ -379,36 +394,39 @@ function App() {
       {showConfigDialog && (
         <div className="dialog-overlay">
           <div className="dialog config-dialog">
-            <h3>MCP 配置说明</h3>
-            <div className="platform-tabs">
-              {Object.entries(platformConfigs).map(([key, platform]) => (
-                <button
-                  key={key}
-                  className={selectedPlatform === key ? 'active' : ''}
-                  onClick={() => setSelectedPlatform(key)}
-                >
-                  {platform.name}
-                </button>
-              ))}
-            </div>
-            <div className="config-content">
-              <div className="config-section">
-                <h4>配置文件路径</h4>
-                <div className="config-path">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].configPath}</div>
+            <button className="dialog-close-btn" onClick={() => setShowConfigDialog(false)} title="关闭">×</button>
+            <div className="config-dialog-header">
+              <h3>MCP 配置说明</h3>
+              <div className="platform-tabs">
+                {Object.entries(platformConfigs).map(([key, platform]) => (
+                  <button
+                    key={key}
+                    className={selectedPlatform === key ? 'active' : ''}
+                    onClick={() => setSelectedPlatform(key)}
+                  >
+                    {platform.name}
+                  </button>
+                ))}
               </div>
-              <h4>配置内容</h4>
-              <div className="code-header">
-                <span>JSON</span>
-                <button onClick={() => handleCopy(platformConfigs[selectedPlatform as keyof typeof platformConfigs].config)}>复制</button>
+            </div>
+
+            <div className="config-dialog-body">
+              <div className="config-content">
+                <div className="config-section">
+                  <h4>配置文件路径</h4>
+                  <div className="config-path">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].configPath}</div>
+                </div>
+                <h4>配置内容</h4>
+                <div className="code-header">
+                  <span>JSON</span>
+                  <button onClick={() => handleCopy(platformConfigs[selectedPlatform as keyof typeof platformConfigs].config)}>复制</button>
+                </div>
+                <pre className="config-code">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].config}</pre>
               </div>
-              <pre className="config-code">{platformConfigs[selectedPlatform as keyof typeof platformConfigs].config}</pre>
+              <div className="config-note">
+                <strong>注意:</strong> 请将 <code>/path/to/skills-router</code> 替换为实际的项目路径,<code>/path/to/your/skills</code> 替换为您的技能目录路径。
+              </div>
             </div>
-            <div className="config-note">
-              <strong>注意:</strong> 请将 <code>/path/to/skills-router</code> 替换为实际的项目路径,<code>/path/to/your/skills</code> 替换为您的技能目录路径。
-            </div>
-          </div>
-          <div className="dialog-actions">
-            <button onClick={() => setShowConfigDialog(false)} className="primary-btn">关闭</button>
           </div>
         </div>
       )}

@@ -174,7 +174,9 @@ ipcMain.handle('delete-skill', async (_event, skillPath) => {
 ipcMain.handle('get-app-info', () => {
     return {
         skillsDir: SKILLS_DIR,
-        // The main.cjs is the server entry point for MCP
-        serverPath: path.join(__dirname, 'main.cjs')
+        // The mcp-server.cjs is the dedicated server entry point
+        serverPath: path.join(__dirname, 'mcp-server.cjs'),
+        appPath: app.getAppPath(),
+        exePath: process.execPath
     };
 });

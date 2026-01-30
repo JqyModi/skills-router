@@ -42,9 +42,9 @@ function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   // App Info for Config Guide
-  const [appInfo, setAppInfo] = useState<{ skillsDir: string, serverPath: string }>({
+  const [appInfo, setAppInfo] = useState<{ skillsDir: string, serverPath: string, appPath?: string, exePath?: string }>({
     skillsDir: '/path/to/your/skills',
-    serverPath: '/path/to/skills-router/packages/core/dist/index.js'
+    serverPath: '/path/to/skills-router/apps/desktop/dist-electron/mcp-server.cjs'
   })
 
   useEffect(() => {
@@ -72,6 +72,25 @@ function App() {
     alert('已复制到剪贴板')
   }
 
+  const getEnv = () => {
+    const env: any = {
+      "SKILLS_DIR": appInfo.skillsDir,
+      "NODE_PATH": appInfo.appPath ? `${appInfo.appPath}/node_modules` : ''
+    };
+    if (appInfo.exePath) {
+      env["ELECTRON_RUN_AS_NODE"] = "1";
+    }
+    return env;
+  };
+
+  const renderEnv = () => {
+    const env = getEnv();
+    return JSON.stringify(env, null, 2)
+      .split('\n')
+      .map((line, i) => i === 0 ? line : '      ' + line)
+      .join('\n');
+  };
+
   // Platform configurations
   const platformConfigs = {
     claude: {
@@ -79,11 +98,9 @@ function App() {
       config: `{
   "mcpServers": {
     "skills-router": {
-      "command": "node",
-      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
-      "env": {
-        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
-      }
+      "command": "${(appInfo.exePath || 'node').replace(/\\/g, '/')}",
+      "args": ["${appInfo.serverPath.replace(/\\/g, '/')}"],
+      "env": ${renderEnv().replace(/\\/g, '/')}
     }
   }
 }`,
@@ -94,11 +111,9 @@ function App() {
       config: `{
   "mcp.servers": {
     "skills-router": {
-      "command": "node",
-      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
-      "env": {
-        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
-      }
+      "command": "${(appInfo.exePath || 'node').replace(/\\/g, '/')}",
+      "args": ["${appInfo.serverPath.replace(/\\/g, '/')}"],
+      "env": ${renderEnv().replace(/\\/g, '/')}
     }
   }
 }`,
@@ -109,11 +124,9 @@ function App() {
       config: `{
   "mcpServers": {
     "skills-router": {
-      "command": "node",
-      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
-      "env": {
-        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
-      }
+      "command": "${(appInfo.exePath || 'node').replace(/\\/g, '/')}",
+      "args": ["${appInfo.serverPath.replace(/\\/g, '/')}"],
+      "env": ${renderEnv().replace(/\\/g, '/')}
     }
   }
 }`,
@@ -124,11 +137,9 @@ function App() {
       config: `{
   "mcpServers": {
     "skills-router": {
-      "command": "node",
-      "args": ["${appInfo.serverPath.replace(/\\/g, '//')}"],
-      "env": {
-        "SKILLS_DIR": "${appInfo.skillsDir.replace(/\\/g, '//')}"
-      }
+      "command": "${(appInfo.exePath || 'node').replace(/\\/g, '/')}",
+      "args": ["${appInfo.serverPath.replace(/\\/g, '/')}"],
+      "env": ${renderEnv().replace(/\\/g, '/')}
     }
   }
 }`,
@@ -136,15 +147,7 @@ function App() {
     }
   } as const;
 
-  useEffect(() => {
-    loadSkills()
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null
-    if (savedTheme) {
-      setTheme(savedTheme)
-      document.documentElement.setAttribute('data-theme', savedTheme)
-    }
-  }, [])
+
 
   useEffect(() => {
     if (selectedSkill) {

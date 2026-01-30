@@ -14,7 +14,10 @@ export default defineConfig({
         vite: {
           build: {
             lib: {
-              entry: 'electron/main.ts',
+              entry: {
+                main: 'electron/main.ts',
+                'mcp-server': 'electron/mcp-server.ts',
+              },
               formats: ['cjs'],
             },
             rollupOptions: {
